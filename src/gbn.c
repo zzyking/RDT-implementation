@@ -57,8 +57,7 @@ void B_output(struct msg message) /* need be completed only for extra credit */
 }
 
 /* called from layer 3, when a packet arrives for layer 4 */
-void A_input(struct pkt packet)
-{
+void A_input(struct pkt packet){
   if (packet.checksum == calculate_checksum(packet)){
     if(packet.acknum == 1){
       if(packet.seqnum >= base){
@@ -70,7 +69,19 @@ void A_input(struct pkt packet)
           starttimer(A, send_time_MAX);
         }
       }
+      printf("          ACK received\n");
+      printf("          seqnum: %d, acknum: %d\n", packet.seqnum, packet.acknum);
     }
+    else if (packet.acknum == -1){
+      for(int i = base; i < nextseq; i++)
+        tolayer3(A, buf[i]);
+      starttimer(A, send_time_MAX);
+      printf("          NAK received\n");
+      printf("          seqnum: %d, acknum: %d\n", packet.seqnum, packet.acknum);
+    }
+  }
+  else{
+    printf("          Corrupted ACK/NAK packet received\n");
   }
 }
 
